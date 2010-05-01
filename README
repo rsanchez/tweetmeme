@@ -1,5 +1,8 @@
 TweetMeme Retweet Button For ExpressionEngine 1.6x.
 
+Installation:
+Requires curl and jQuery for the Control Panel. You must install the extension. The plugin is optional.
+
 Extension Usage:
 This addon can adds a tag to your weblog entries loop which displays the tweetmeme retweet button.
 

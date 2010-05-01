@@ -5,7 +5,7 @@ $plugin_info = array(
 	'pi_version' => '1.0.0',
 	'pi_author' => 'Rob Sanchez',
 	'pi_author_url' => 'http://barrettnewton.com/',
-	'pi_description' => 'Adds a button which easily lets you retweet your blog posts.',
+	'pi_description' => 'Adds a button which easily lets you retweet your blog posts. A port of the official TweetMeme Wordpress plugin.',
 	'pi_usage' => Tweetmeme::usage()
 );
 
@@ -15,7 +15,7 @@ class Tweetmeme
 
 	function Tweetmeme()
 	{
-		global $TMPL, $DB;
+		global $TMPL, $DB, $SESS;
 		
 		if ( ! class_exists('Tweetmeme_ext'))
 		{
@@ -28,16 +28,21 @@ class Tweetmeme
 		
 		if ($TMPL->fetch_param('entry_id'))
 		{
-			$query = $DB->query("SELECT * FROM exp_weblog_titles WHERE entry_id = '".$DB->escape_str($TMPL->fetch_param('entry_id'))."' LIMIT 1");
+			if (isset($SESS->cache['tweetmeme']['entry_data'][$TMPL->fetch_param('entry_id')]))
+			{
+				$this->ext->entry_data = $SESS->cache['tweetmeme']['entry_data'][$TMPL->fetch_param('entry_id')];
+			}
+			else
+			{
+				$query = $DB->query("SELECT * FROM exp_weblog_titles WHERE entry_id = '".$DB->escape_str($TMPL->fetch_param('entry_id'))."' LIMIT 1");
 			
-			$this->ext->entry_data = $query->row;
+				$this->ext->entry_data = $SESS->cache['tweetmeme']['entry_data'][$TMPL->fetch_param('entry_id')] = $query->row;
+			}
 		}
 		
-		$this->return_data = $this->ext->_get_button();
+		$this->return_data = $this->ext->get_button();
 		
 		unset($this->ext);
-        str_repla
-
 	}
 
 	function usage()

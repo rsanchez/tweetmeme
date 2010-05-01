@@ -4,9 +4,10 @@ class Tweetmeme_ext
 {
 	var $name = 'TweetMeme Retweet Button';
 	var $version = '1.0.0';
-	var $description = 'Adds a button which easily lets you retweet your blog posts.';
+	var $description = 'Adds a button which easily lets you retweet your blog posts. A port of the official TweetMeme Wordpress plugin.';
 	var $settings_exist = 'y';
 	var $docs_url = '';
+	var $classname = 'Tweetmeme_ext';
 	var $settings = array();
 	var $button_params = array();
 	var $entry_data = array();
@@ -19,19 +20,19 @@ class Tweetmeme_ext
 		
 		if ( ! $this->settings)
 		{
-			$this->_load_settings();
+			$this->load_settings();
 		}
 		
 		$LANG->fetch_language_file('tweetmeme_ext');
 		
 		$this->button_params = array(
-			'style' => $this->_setting('tm_style'),
-			'type' => $this->_setting('tm_version'),
-			'source' => $this->_setting('tm_source'),
-			'url_shortener' => $this->_setting('tm_url_shortener'),
-			'api_key' => $this->_setting('tm_api_key'),
-			'spaces' => $this->_setting('tm_space'),
-			'hashtags' => $this->_setting('tm_hashtags')
+			'style' => $this->setting('tm_style'),
+			'type' => $this->setting('tm_version'),
+			'source' => $this->setting('tm_source'),
+			'url_shortener' => $this->setting('tm_url_shortener'),
+			'api_key' => $this->setting('tm_api_key'),
+			'spaces' => $this->setting('tm_space'),
+			'hashtags' => $this->setting('tm_hashtags')
 		);
 	}
 
@@ -46,7 +47,7 @@ class Tweetmeme_ext
 		$DB->query($DB->insert_string(
 			'exp_extensions',
 			array(
-				'class' => __CLASS__,
+				'class' => $this->classname,
 				'method' => 'weblog_entries_tagdata',
 				'hook' => 'weblog_entries_tagdata',
 				'priority' => 10,
@@ -57,7 +58,7 @@ class Tweetmeme_ext
 		
 		$DB->query($DB->insert_string('exp_extensions',
 			array(
-				'class' => __CLASS__,
+				'class' => $this->classname,
 				'method' => 'edit_entries_additional_celldata',
 				'hook' => 'edit_entries_additional_celldata',
 				'priority' => 1,
@@ -68,7 +69,7 @@ class Tweetmeme_ext
 		
 		$DB->query($DB->insert_string('exp_extensions',
 			array(
-				'class' => __CLASS__,
+				'class' => $this->classname,
 				'method' => 'edit_entries_additional_tableheader',
 				'hook' => 'edit_entries_additional_tableheader',
 				'priority' => 1,
@@ -79,7 +80,7 @@ class Tweetmeme_ext
 		
 		$DB->query($DB->insert_string('exp_extensions',
 			array(
-				'class' => __CLASS__,
+				'class' => $this->classname,
 				'method' => 'edit_entries_extra_actions',
 				'hook' => 'edit_entries_extra_actions',
 				'priority' => 1,
@@ -91,7 +92,7 @@ class Tweetmeme_ext
 		$DB->query($DB->insert_string(
 			'exp_extensions',
 			array(
-				'class' => __CLASS__,
+				'class' => $this->classname,
 				'method' => 'submit_new_entry_absolute_end',
 				'hook' => 'submit_new_entry_absolute_end',
 				'settings' => '',
@@ -114,7 +115,7 @@ class Tweetmeme_ext
 		$DB->query($DB->update_string(
 			'exp_extensions',
 			array('version' => $this->version),
-			array('class' => __CLASS__)
+			array('class' => $this->classname)
 		));
 	}
 	
@@ -122,7 +123,7 @@ class Tweetmeme_ext
 	{
 		global $DB;
 	
-		$DB->query("DELETE FROM exp_extensions WHERE class = '".__CLASS__."'");
+		$DB->query("DELETE FROM exp_extensions WHERE class = '".$this->classname."'");
 	}
 	
 	function settings()
@@ -276,7 +277,7 @@ class Tweetmeme_ext
 		
 		if ($IN->GBL('tm_analytics'))
 		{
-			exit($this->_ajax_elev_lookup());
+			exit($this->ajax_elev_lookup());
 		}
 		
 		if ( ! class_exists('Utilities'))
@@ -290,20 +291,20 @@ class Tweetmeme_ext
 		
 		$name = $LANG->line('tm_name');
     	
-       	$r = $DSP->table('', '', '', '100%')
-             .$DSP->tr()
-             .$DSP->td('default', '', '', '', 'top')
-             .$DSP->heading($LANG->line('extension_settings'));
+		$r = $DSP->table('', '', '', '100%')
+		.$DSP->tr()
+		.$DSP->td('default', '', '', '', 'top')
+		.$DSP->heading($LANG->line('extension_settings'));
              
-        $qm		= ($PREFS->ini('force_query_string') == 'y') ? '' : '?';
+		$qm		= ($PREFS->ini('force_query_string') == 'y') ? '' : '?';
 
-        $r .= $DSP->td_c()
-             .$DSP->td('default', '', '', '', 'middle')
-             .$DSP->qdiv('defaultRight', '<strong>'.'</strong>'.NBS.NBS)
-             .$DSP->td_c()
-             .$DSP->tr_c()
-             .$DSP->tr()
-             .$DSP->td('default', '100%', '2', '', 'top');
+		$r .= $DSP->td_c()
+			.$DSP->td('default', '', '', '', 'middle')
+			.$DSP->qdiv('defaultRight', '<strong>'.'</strong>'.NBS.NBS)
+			.$DSP->td_c()
+			.$DSP->tr_c()
+			.$DSP->tr()
+			.$DSP->td('default', '100%', '2', '', 'top');
 		
 		if ( ! isset($SESS->cache['tweetmeme']['weblogs']))
 		{
@@ -318,19 +319,19 @@ class Tweetmeme_ext
 			$LANG->language['tm_use_url_title_'.$row['weblog_id']] = $row['blog_title'].$LANG->line('tm_path_type');
 		}
              
-        $r .= Utilities::extension_settings_form($name, $IN->GBL('name'), $this->settings(), $current);
+		$r .= Utilities::extension_settings_form($name, $IN->GBL('name'), $this->settings(), $current);
              
 		$r .=  $DSP->td_c()
-			  .$DSP->tr_c()
-			  .$DSP->table_c()
-			  .$DSP->td_c()
-			  .$DSP->tr_c()
-			  .$DSP->table_c();
+			.$DSP->tr_c()
+			.$DSP->table_c()
+			.$DSP->td_c()
+			.$DSP->tr_c()
+			.$DSP->table_c();
 			  
 		$DSP->title  = $LANG->line('extension_settings');
-        $DSP->crumb  = $DSP->anchor(BASE.AMP.'C=admin'.AMP.'area=utilities', $LANG->line('utilities')).
-					   $DSP->crumb_item($DSP->anchor(BASE.AMP.'C=admin'.AMP.'M=utilities'.AMP.'P=extensions_manager', $LANG->line('extensions_manager')));
-        $DSP->crumb .= $DSP->crumb_item($name);
+		$DSP->crumb  = $DSP->anchor(BASE.AMP.'C=admin'.AMP.'area=utilities', $LANG->line('utilities')).
+		$DSP->crumb_item($DSP->anchor(BASE.AMP.'C=admin'.AMP.'M=utilities'.AMP.'P=extensions_manager', $LANG->line('extensions_manager')));
+		$DSP->crumb .= $DSP->crumb_item($name);
 		
 		$DSP->body = $r;
 	}
@@ -338,7 +339,7 @@ class Tweetmeme_ext
 /**
 * Private Utilities
 */
-	function _load_settings()
+	function load_settings()
 	{
 		global $EXT;
 		
@@ -348,17 +349,17 @@ class Tweetmeme_ext
 		}
 	}
 	
-	function _setting($key)
+	function setting($key)
 	{
 		return (isset($this->settings[$key])) ? $this->settings[$key] : FALSE;
 	}
 	
-	function _entry_data($key)
+	function entry_data($key)
 	{
 		return (isset($this->entry_data[$key])) ? $this->entry_data[$key] : FALSE;
 	}
 	
-	function _button_param($key)
+	function button_param($key)
 	{
 		return (isset($this->button_params[$key])) ? $this->button_params[$key] : FALSE;
 	}
@@ -369,13 +370,13 @@ class Tweetmeme_ext
 	/**
 	* Get the stats for a URL
 	*/
-	function _ajax_elev_lookup()
+	function ajax_elev_lookup()
 	{
 		global $IN;
 		// read submitted information
 		$url = $IN->GBL('url');
 		// fetch the data from tweetmeme
-		$json = $this->_get_tweets($url);
+		$json = $this->get_tweets($url);
 		// get the data
 		$data = $json['data'];
 		// build up the output
@@ -426,18 +427,18 @@ class Tweetmeme_ext
 	/**
 	* Build up all the params for the button
 	*/
-	function _build_button_options()
+	function build_button_options()
 	{
-		$button = '?url='.urlencode($this->_get_url());
+		$button = '?url='.urlencode($this->get_url());
 	
 		// now build up the params, start with the source
-		if ($this->_setting('tm_source'))
+		if ($this->setting('tm_source'))
 		{
-			$button .= '&amp;source='.urlencode($this->_setting('tm_source'));
+			$button .= '&amp;source='.urlencode($this->setting('tm_source'));
 		}
 	
 		// which style
-		if ($this->_setting('tm_version') == 'compact')
+		if ($this->setting('tm_version') == 'compact')
 		{
 			$button .= '&amp;style=compact';
 		}
@@ -447,28 +448,28 @@ class Tweetmeme_ext
 		}
 	
 		// what shortner to use
-		if ($this->_setting('tm_url_shortner'))
+		if ($this->setting('tm_url_shortner'))
 		{
-			$button .= '&amp;service='.urlencode($this->_setting('tm_url_shortner'));
+			$button .= '&amp;service='.urlencode($this->setting('tm_url_shortner'));
 		}
 	
 		// does the shortner have an API key
-		if ($this->_setting('tm_api_key'))
+		if ($this->setting('tm_api_key'))
 		{
-			$button .= '&amp;service_api='.urlencode($this->_setting('tm_api_key'));
+			$button .= '&amp;service_api='.urlencode($this->setting('tm_api_key'));
 		}
 	
 		// how many spaces do we want to leave at the end
-		if ($this->_setting('tm_space'))
+		if ($this->setting('tm_space'))
 		{
-			$button .= '&amp;space='.$this->_setting('tm_space');
+			$button .= '&amp;space='.$this->setting('tm_space');
 		}
 	
 		// append the hashtags
-		if ($this->_button_param('hashtags'))
+		if ($this->button_param('hashtags'))
 		{
 			// first split them out
-			$hashtags = explode(',', $this->_button_param('hashtags'));
+			$hashtags = explode(',', $this->button_param('hashtags'));
 			// go through and urlencode
 			foreach($hashtags as $row => $tag) {
 				$hashtags[$row] = urlencode(trim($tag));
@@ -483,13 +484,13 @@ class Tweetmeme_ext
 	/**
 	* Generate the iFrame render of the button
 	*/
-	function _generate_button() {
+	function generate_button() {
 		// build up the outer style
-		$button = '<div class="tweetmeme_button" style="'.$this->_setting('tm_style').'">';
-		$button .= '<iframe src="http://api.tweetmeme.com/button.js'.$this->_build_button_options().'" ';
+		$button = '<div class="tweetmeme_button" style="'.$this->setting('tm_style').'">';
+		$button .= '<iframe src="http://api.tweetmeme.com/button.js'.$this->build_button_options().'" ';
 	
 		// give it a height, dependant on style
-		if ($this->_setting('tm_version') == 'compact')
+		if ($this->setting('tm_version') == 'compact')
 		{
 			$button .= 'height="20" width="90"';
 		}
@@ -506,12 +507,12 @@ class Tweetmeme_ext
 	/**
 	* Generates the image button
 	*/
-	function _generate_static_button()
+	function generate_static_button()
 	{
 		return
-			'<div class="tweetmeme_button" style="'.$this->_setting('tm_style').'">
-				<a href="http://api.tweetmeme.com/share?url='.urlencode($this->_get_url()).'">
-					<img src="http://api.tweetmeme.com/imagebutton.gif'.$this->_build_button_options().'" height="61" width="50" />
+			'<div class="tweetmeme_button" style="'.$this->setting('tm_style').'">
+				<a href="http://api.tweetmeme.com/share?url='.urlencode($this->get_url()).'">
+					<img src="http://api.tweetmeme.com/imagebutton.gif'.$this->build_button_options().'" height="61" width="50" />
 				</a>
 			</div>';
 	}
@@ -519,11 +520,11 @@ class Tweetmeme_ext
 	/**
 	* Get the URL for the current button
 	*/
-	function _get_url($row = NULL)
+	function get_url($row = NULL)
 	{
 		global $FNS;
 		
-		$this->_load_settings();
+		$this->load_settings();
 		
 		if ( ! empty($row['weblog_id']))
 		{
@@ -573,15 +574,15 @@ class Tweetmeme_ext
 	/**
 	* Get the button
 	*/
-	function _get_button()
+	function get_button()
 	{
-		return ($this->_is_rss()) ? $this->_generate_static_button() : $this->_generate_button();
+		return ($this->is_rss()) ? $this->generate_static_button() : $this->generate_button();
 	}
 
 	/**
 	* Load the tweets for a URL
 	*/
-	function _get_tweets($url)
+	function get_tweets($url)
 	{
 		if (function_exists('curl_init'))
 		{
@@ -618,7 +619,7 @@ class Tweetmeme_ext
 	/**
 	* Is this an RSS template?
 	*/
-	function _is_rss()
+	function is_rss()
 	{
 		global $TMPL;
 		
@@ -642,7 +643,7 @@ class Tweetmeme_ext
 			
 		$style = ($SESS->cache['tweetmeme']['row_count']++ % 2) ? 'tableCellOne' : 'tableCellTwo';
 		
-		$text = ($url = $this->_get_url($row)) ? '<a href="javascript:void(0);" onclick="tm_load_analytics(\''.$url.'\', this)">'.$LANG->line('tm_view_stats').'</a>' : '<span style="color:#666;">'.$LANG->line('tm_not_active').'</span>';
+		$text = ($url = $this->get_url($row)) ? '<a href="javascript:void(0);" onclick="tm_load_analytics(\''.$url.'\', this)">'.$LANG->line('tm_view_stats').'</a>' : '<span style="color:#666;">'.$LANG->line('tm_not_active').'</span>';
 		
 		$return_data .= $DSP->table_qcell($style, $DSP->qdiv('smallNoWrap', $text));
 		
@@ -718,11 +719,11 @@ class Tweetmeme_ext
 	*/
 	function submit_new_entry_absolute_end($entry_id, $data)
 	{
-		if ($this->_setting('tm_ping') && function_exists('curl_init'))
+		if ($this->setting('tm_ping') && function_exists('curl_init'))
 		{
 			$data['entry_id'] = $entry_id;
 			
-			if ($url = $this->_get_url($data))
+			if ($url = $this->get_url($data))
 			{
 				// create a new cURL resource
 				$ch = curl_init();
@@ -755,7 +756,7 @@ class Tweetmeme_ext
 		
 		$this->entry_data = $row;
 		
-		$this->_load_settings();
+		$this->load_settings();
 		
 		if (isset($this->settings['tm_path_'.$row['weblog_id']]))
 		{
@@ -807,7 +808,7 @@ class Tweetmeme_ext
 					}
 				}
 				
-				$tagdata = str_replace($full_match, $this->_get_button(), $tagdata);
+				$tagdata = str_replace($full_match, $this->get_button(), $tagdata);
 			}
 		}
 		
