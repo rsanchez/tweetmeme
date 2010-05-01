@@ -44,40 +44,49 @@ class Tweetmeme
 	{
 		ob_start(); 
 ?>
-This addon can be used as a standalone plugin, like this:
-{exp:tweetmeme url="{path=site/index}"}
+Extension Usage:
+This addon can adds a tag to your weblog entries loop which displays the tweetmeme retweet button.
 
-or within an entries loop as a single tag, like this:
-{exp:weblog:entries weblog="blog"}
-{tweetmeme hashtags="my,topics"}
-{/exp:weblog:entries}
-
-Your default parameters are stored in the extension settings. You may override your set defaults with tag parameters.
-
-For each of your weblogs/channels, you can specify a site path . If you don't specify a site path for your weblog/channel in the extension settings, you must specify a path (either url, entry_id_path, url_title_path, title_permalink, or path) in the tag parameters. Also, if you do not specify a site path for your weblog/channel, you will not be able to track your stats in the control panel.
-
-If you are using the standalone plugin, you must specify an entry_id if you want to be able to use the entry_id_path, url_title_path or title_permalink parameters.
-{exp:tweetmeme entry_id="{segment_3} url_title_path="site/view"}
-
-If you are using the single tag within a weblog/channel entries loop and you have specified a site path in the extension settings, you DO NOT need to specify any kind of url/path in the tag.
-{exp:weblog:entries weblog="blog"}
+{exp:weblog:entries weblog="weblog"}
 {tweetmeme}
 {/exp:weblog:entries}
 
+Your default parameters are stored in the extension settings. You may override your set defaults with tag parameters, like so:
+{exp:weblog:entries weblog="weblog"}
+{tweetmeme type="compact" style="border:10px solid red;"}
+{/exp:weblog:entries}
+
+In the extension settings, you can specify a "site path" for each of your weblogs, which is a path to your single-entry template. This will enable the extension to "know" the entry's URL.
+
+If you don't specify a site path for your weblog in the extension settings, you must specify one of the "path" parameters (either url, entry_id_path, url_title_path, title_permalink, or path) in the tag parameters. Also, if you do not specify a site path for your weblog, you will not be able to track your stats in the control panel.
+
+{exp:weblog:entries weblog="weblog"}
+{tweetmeme entry_id_path="site/view"}
+{/exp:weblog:entries}
+
+
+Plugin Usage:
+You can also use as a standalone plugin, outside of a weblog:entries loop like this:
+{exp:tweetmeme path="site/index"}
+
+If you are using the standalone plugin, you must specify an entry_id if you want to be able to use the entry_id_path, url_title_path or title_permalink
+parameters.
+{exp:tweetmeme entry_id="{segment_3}" url_title_path="site/view"}
+
+
 Parameters:
-url - a full url, e.g. {exp:tweetmeme url="{path=site/index}"}
-entry_id
-entry_id_path - a path to be appended by the entry_id, e.g. {tweetmeme entry_id_path="site/view"}
-url_title_path - a path to be appended by the url_title, e.g. {tweetmeme url_title_path="site/view"}
-title_permalink - an alias of url_title_path
 path - a site path, eg {exp:tweetmeme path="site/about"}
-style - style for the button-containing div
-type - 'compact' or 'large', default is compact
-source - your twitter username, will show up as RT @username
-url_shortener - choose a url shortening service
-api_key - awe.sm requires an api key
-spaces - spaces to leave at end of tweet
-hashtags - comma separated list of topics to add to the tweet, you can use a custom field here, e.g. {tweetmeme hashtags="ee,tweetmeme"} or {tweetmeme hashtags="{my_tags}"}
+entry_id_path - a path to be appended by the entry_id, e.g. {tweetmeme entry_id_path="site/view" entry_id="{segment_3}"}
+url_title_path - a path to be appended by the url_title, e.g. {tweetmeme url_title_path="site/view" entry_id="{segment_3}"}
+title_permalink - an alias of url_title_path
+url - a full url, e.g. {exp:tweetmeme url="http://whatevs.com"}
+style (optional) - style for the button-containing div
+type (optional) - 'compact' or 'large', default is compact
+source (optional) - your twitter username, will show up as RT @username
+url_shortener (optional) - choose a url shortening service
+api_key (optional) - awe.sm requires an api key
+spaces (optional) - spaces to leave at end of tweet
+hashtags (optional) - comma separated list of topics to add to the tweet, you can use a custom field here, e.g. {tweetmeme hashtags="ee,tweetmeme"} or {tweetmeme hashtags="{my_tags}"}
 <?php
 		$buffer = ob_get_contents();
 	
